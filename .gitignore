@@ -1,0 +1,10 @@
+# C++ objects and libs
+*.vcxproj
+*.filters
+*.user
+*.obj
+*.log
+*.tlog
+*.pdb
+*.idb
+*.pch
