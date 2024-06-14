@@ -3,8 +3,7 @@
 #include "Module.h"
 #include "CRegistrar.h"
 #include "CConnector.h"
-#include <boost/thread.hpp>
-#include <boost/uuid/random_generator.hpp>
+
 CSTMODULE_API IProvider& GetProvider() {
 	static CProvider prov;
 	return prov;

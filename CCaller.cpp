@@ -1,10 +1,6 @@
 #include "pch.h"
 #include "CCaller.h"
 #include "CMessenger.h"
-#include <boost/bind.hpp>
-#include <memory>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
 #include "CSession.h"
 CCaller::CCaller(boost::asio::io_context& io, const boost::uuids::uuid& uuid): _io(io), _uuid(uuid)
 {
@@ -12,9 +8,8 @@ CCaller::CCaller(boost::asio::io_context& io, const boost::uuids::uuid& uuid): _
 
 void CCaller::OnResponseReceived(const CMessagePtr& msg)
 {
-	// TODO deserialization vector<char> -> TaskResponse
-	boost::unique_lock<boost::mutex> lock(_mutex);
-	TaskResponse response;
+	boost::unique_lock lock(_mutex);
+	TaskResponse response = unpackTaskData<TaskResponse>(msg->GetBufferData());
 	auto iter = _active_sessions.find(response.uuid);
 	auto end = _active_sessions.end();
 	CSessionPtr obj;

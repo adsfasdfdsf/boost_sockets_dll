@@ -17,9 +17,15 @@ public:
 	static CMessengerPtr Instance(boost::asio::io_context& io, 
 		const error_handler& error_handle, const receive_handler& receive_handle);
 
+	static CMessengerPtr Instance(boost::asio::io_context& io);
+
 	void Run(SocketPtr sock);
 
 	void AsyncSend(const CMessagePtr& msg);
+
+	void SetReceiveHandler(const receive_handler& rh);
+
+	void SetErrorHandler(const error_handler& eh);
 private:
 	void StartAsyncOperations();
 
@@ -38,6 +44,9 @@ private:
 			   const receive_handler& receive_handle) : _io(io), 
 														_error_handler(error_handle), 
 														_receive_handler(receive_handle) {};
+
+	CMessenger(boost::asio::io_context& io) : _io(io)
+	{};
 
 
 private:
@@ -74,6 +83,11 @@ private:
 CMessengerPtr CMessenger::Instance(boost::asio::io_context& io, 
 	const error_handler& error_handle, const receive_handler& receive_handle) {
 	return CMessengerPtr(new CMessenger(io, error_handle, receive_handle));
+}
+
+
+CMessengerPtr CMessenger::Instance(boost::asio::io_context& io) {
+	return CMessengerPtr(new CMessenger(io));
 }
 
 

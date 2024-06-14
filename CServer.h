@@ -26,7 +26,7 @@ class CAcceptor {
 private:
 	CAcceptor(boost::asio::io_context& io, unsigned short port, const std::wstring& executor_name);
 	void InitAccept();
-	void OnAccept(const boost::system::error_code& ec, const boost::asio::ip::tcp::socket& sock);
+	void OnAccept(const boost::system::error_code& ec, const SocketPtr& sock_ptr);
 public:
 	static std::unique_ptr<CAcceptor> Instance(boost::asio::io_context& io, unsigned short port, const std::wstring& executor_name);
 	void Start();

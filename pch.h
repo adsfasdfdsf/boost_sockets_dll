@@ -9,5 +9,21 @@
 #include "fwd.h"
 // Добавьте сюда заголовочные файлы для предварительной компиляции
 #include "framework.h"
-
+#include <boost/thread.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <deque>
+#include <boost/function.hpp>
+#include <boost/asio/coroutine.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/bind.hpp>
+#include <memory>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/make_shared.hpp>
+#include <future>
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <boost/thread.hpp>
+#include <boost/asio.hpp>
 #endif //PCH_H

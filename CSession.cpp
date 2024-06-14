@@ -9,8 +9,7 @@ CSessionPtr CSession::Instance(const TaskRequest& request, const CMessengerPtr& 
 
 void CSession::SendRequest()
 {
-	// TODO serialization TaskRequest -> vector<char>
-	_messenger_ptr->AsyncSend(CMessage::Instance({}, CMessage::TaskProccess));
+	_messenger_ptr->AsyncSend(CMessage::Instance(packTaskData<TaskRequest>(_request), CMessage::TaskProccess));
 }
 
 void CSession::onResponseReceived(const TaskResponse& resp)

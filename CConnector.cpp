@@ -2,11 +2,6 @@
 #include "CConnector.h"
 #include "pch.h"
 #include "CConnector.h"
-#include <boost/make_shared.hpp>
-#include <future>
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <boost/bind.hpp>
 
 //hidden interface
 CConnector::CConnector(const std::wstring& ip, unsigned short port, const std::wstring& executor_name) :

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "CServer.h"
-#include <boost/asio.hpp>
 #include "port_selector.h"
+#include "CMessenger.h"
 CRemoteConnectionManagerPtr CRemoteConnectionManager::Instance(const std::wstring& executor_name)
 {
 	return CRemoteConnectionManagerPtr(new CRemoteConnectionManager(executor_name));
@@ -11,7 +11,7 @@ void CRemoteConnectionManager::StartAcceptingRemoteConnections(unsigned short po
 	if (!_io.stopped()) {
 		_acceptor_ptr = CAcceptor::Instance(_io, port, _executor_name);
 		_acceptor_ptr->Start();
-		for (auto i = 0; i < std::thread::hardware_concurrency(); ++i) {
+		for (size_t i = 0; i < std::thread::hardware_concurrency(); ++i) {
 			_thread_pool.push_back(boost::make_shared<boost::thread>(new boost::thread(boost::bind(&boost::asio::io_service::run, &_io))));
 		}
 	}
@@ -68,6 +68,27 @@ CAcceptor::CAcceptor(boost::asio::io_context& io, unsigned short port, const std
 	_acceptor.set_option(serverOption);
 }
 
+void CAcceptor::InitAccept()
+{
+	SocketPtr sock_ptr(new boost::asio::ip::tcp::socket(_io));
+	_acceptor.async_accept(*sock_ptr.get(), [this, sock_ptr](const boost::system::error_code& ec) {
+			OnAccept(ec, sock_ptr);
+		});
+}
+
+void CAcceptor::OnAccept(const boost::system::error_code& ec, const SocketPtr& sock_ptr)
+{
+	if (ec.value() == 0) {
+		CMessengerPtr messenger_ptr = CMessenger::Instance(_io);
+		boost::lock_guard lock(_mutex);
+		// TODO active_services . push back service
+		_active_services.push_back({});
+	}
+	if (!_is_stopped.load()) {
+		InitAccept();
+	}
+}
+
 std::unique_ptr<CAcceptor> CAcceptor::Instance(boost::asio::io_context& io, unsigned short port, const std::wstring& executor_name)
 {
 	return std::unique_ptr<CAcceptor>(new CAcceptor(io, port, executor_name));
@@ -75,7 +96,8 @@ std::unique_ptr<CAcceptor> CAcceptor::Instance(boost::asio::io_context& io, unsi
 
 void CAcceptor::Start()
 {
-
+	_acceptor.listen();
+	InitAccept();
 }
 
 void CAcceptor::Restart()

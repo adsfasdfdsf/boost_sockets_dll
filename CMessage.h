@@ -38,7 +38,13 @@ public:
 		return {&_buffer.at(0), _header._body_size};
 	};
 
-
+	std::vector<char> GetBufferData() {
+		_ASSERT(_header._body_size > 0);
+		if (_header._body_size != _buffer.size()) {
+			_buffer.resize(_header._body_size);
+		}
+		return _buffer;
+	};
 
 private:
 	CMessage() {};

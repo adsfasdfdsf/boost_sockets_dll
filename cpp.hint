@@ -1,0 +1,6 @@
+// Файлы указаний помогают среде IDE Visual Studio интерпретировать идентификаторы Visual C++
+// (например, имена функций и макросов).
+// Дополнительные сведения: https://go.microsoft.com/fwlink/?linkid=865984
+#define CSTMODULE_API declspec(dllexport)
+#define CSTMODULE_API __attribute ((visibility ("default")))
+#define CSTMODULE_API declspec(dllimport)
