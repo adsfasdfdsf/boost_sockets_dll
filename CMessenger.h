@@ -164,6 +164,7 @@ void CMessenger::SendQueue() {
 
 
 boost::system::error_code CMessenger::AsyncReceive() {
+	boost::system::error_code ec;
 	BOOST_ASIO_CORO_REENTER(_receive_coroutine) while (!_abort_connection) {
 		_msg = CMessage::Instance();
 		BOOST_ASIO_CORO_YIELD boost::asio::async_read(*_sock, mutable_message_header(_msg), boost::bind(&CMessenger::OnRecieve, this, _1, _2));
@@ -172,6 +173,10 @@ boost::system::error_code CMessenger::AsyncReceive() {
 			if (!_receive_handler.empty()) {
 				_io.post(boost::bind(_receive_handler, _msg));
 			}
+		}
+		else {
+			ec = boost::system::error_code(boost::system::errc::bad_message, boost::system::generic_category());
+			return ec;
 		}
 	}
 

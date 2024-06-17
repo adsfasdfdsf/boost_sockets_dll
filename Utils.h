@@ -26,6 +26,7 @@ struct TaskRequest {
 	boost::uuids::uuid uuid;
 	std::wstring task_name;
 	std::vector<char> data;
+	ResState res_state;
 };
 
 BOOST_SERIALIZATION_SPLIT_FREE(TaskRequest);

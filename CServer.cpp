@@ -21,6 +21,7 @@ void CRemoteConnectionManager::StartAcceptingRemoteConnections(unsigned short po
 		_acceptor_ptr->Restart();
 	}
 }
+
 void CRemoteConnectionManager::StartAcceptingRemoteConnections()
 {
 	StartAcceptingRemoteConnections(get_free_port());
