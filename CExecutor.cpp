@@ -8,22 +8,27 @@ void CExecutor::AddTaskHandler(const std::wstring& TaskName, eExecutionPolicy po
 	_tasks.insert(task);
 }
 
-CExecutorPtr CExecutor::Instance(const std::wstring& ExecName)
+CExecutorPtr CExecutor::Instance(const std::wstring& ExecName, DWORD main_thread_id)
 {
-	return CExecutorPtr(new CExecutor(ExecName));
+	return CExecutorPtr(new CExecutor(ExecName, main_thread_id));
 }
 
 bool CExecutor::Proccess(const TaskRequest& task_request, TaskResponse& task_response)
 {
 	task_response.res_state = ResState::Undefined;
+	auto task = _tasks.find(CExecutor::Task({ task_request.task_name }));
+	if (task == _tasks.end()) {
+		return false;
+	}
+	if (task->_policy == eExecutionPolicy::MainThread) {
+		execute_in_thread(_main_thread_id, [&task, &task_request, &task_response]() {task->_func(task_request.data, task_response); });
+		return true;
+	}
+	task->_func(task_request.data, task_response);
 	return true;
-	// найти нужный таск в tasks если нет то return false;
-	//если есть то в завис от exec policy выполнить в main thread или worker thread
-	// если working thread то просто вызвать  если main thread то в другом 
 }
 
-CExecutor::CExecutor(const std::wstring& ExecName) : _exec_name(ExecName)
+CExecutor::CExecutor(const std::wstring& ExecName, DWORD main_thread_id) : _exec_name(ExecName), _main_thread_id(main_thread_id)
 {
-
 }
 

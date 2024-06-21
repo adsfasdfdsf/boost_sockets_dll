@@ -97,3 +97,21 @@ enum eExecutionPolicy
     MainThread,
     WorkerThread
 };
+
+
+
+
+
+// execute in main thread
+inline void execute_in_thread(DWORD thread_id, const boost::function<void ()>& func) {
+	if (thread_id == GetCurrentThreadId()) return func();
+	std::packaged_task<void()> t(func);
+	auto future = t.get_future();
+
+	BOOL res = FALSE;
+	while (!(res = PostThreadMessage(thread_id, RegisterWindowMessage(L"execute_in_main_thread_message"), (WPARAM)&t, 2)) && GetLastError() == ERROR_NOT_ENOUGH_QUOTA) {
+		Sleep(500);
+	}
+	if (res) future.get();
+}
+

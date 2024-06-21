@@ -8,7 +8,7 @@ IExecutorPtr CRegistrar::RegisterExecutor(const std::wstring& ExecName)
     if (iter != _executors.end()) {
         return iter->second;
     }
-    auto exec = CExecutor::Instance(ExecName);
+    auto exec = CExecutor::Instance(ExecName, _main_thread_id);
     _executors[ExecName] = exec;
     _servers[ExecName] = CRemoteConnectionManager::Instance(ExecName);
     return exec;
@@ -47,7 +47,7 @@ unsigned short CRegistrar::AllowRemoteExecution(const std::wstring& ExecName)
 {
     auto obj = _servers[ExecName];
     if (!obj) {
-        return;
+        return 0;
     }
     obj->StartAcceptingRemoteConnections();
     return obj->GetOpenedPort();

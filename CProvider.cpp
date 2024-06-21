@@ -21,6 +21,6 @@ IConnectorPtr CProvider::getConnector(const std::wstring& ip, unsigned short por
 
 IRegistrar& CProvider::getRegistrar()
 {
-	static CRegistrar reg;
+	static CRegistrar reg(GetCurrentThreadId());
 	return reg;
 }

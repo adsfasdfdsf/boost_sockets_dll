@@ -1,7 +1,9 @@
 #pragma once
 #include "fwd.h"
 #include "CMessage.h"
-class CService {
+
+class CService 
+{
 public:
 	static CServicePtr Instance(const CMessengerPtr& messenger_ptr, const std::wstring& executor_name);
 private:

@@ -42,7 +42,7 @@ boost::signals2::scoped_connection CCaller::Init(const SocketPtr& _sock, const b
 std::future<TaskResponse> CCaller::Call(const TaskRequest& request)
 {
 	boost::lock_guard<boost::mutex> lock(_mutex);
-	auto promise = std::make_shared<std::promise<TaskResponse>>(new std::promise<TaskResponse>());
+	auto promise = std::shared_ptr<std::promise<TaskResponse>>(new std::promise<TaskResponse>());
 	if (request.uuid.is_nil()) {
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid uuid = gen();

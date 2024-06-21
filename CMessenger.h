@@ -14,30 +14,30 @@ using receive_handler = boost::function<void(const CMessagePtr&)>;
 class CMessenger
 {
 public:
-	static CMessengerPtr Instance(boost::asio::io_context& io, 
-		const error_handler& error_handle, const receive_handler& receive_handle);
+	//static CMessengerPtr Instance(boost::asio::io_context& io, 
+	//	const error_handler& error_handle, const receive_handler& receive_handle);
 
-	static CMessengerPtr Instance(boost::asio::io_context& io);
+	//static CMessengerPtr Instance(boost::asio::io_context& io);
 
-	void Run(SocketPtr sock);
+	//void Run(SocketPtr sock);
 
-	void AsyncSend(const CMessagePtr& msg);
+	//void AsyncSend(const CMessagePtr& msg);
 
-	void SetReceiveHandler(const receive_handler& rh);
+	//void SetReceiveHandler(const receive_handler& rh);
 
-	void SetErrorHandler(const error_handler& eh);
+	//void SetErrorHandler(const error_handler& eh);
 private:
-	void StartAsyncOperations();
-
-	void OnWrite(const boost::system::error_code& er, size_t size);
-
-	void OnRecieve(const boost::system::error_code& er, size_t size);
-
-	void OnError(const boost::system::error_code ec);
-	
-	void SendQueue();
-
-	boost::system::error_code AsyncReceive();
+//	void StartAsyncOperations();
+//
+//	void OnWrite(const boost::system::error_code& er, size_t size);
+//
+//	void OnRecieve(const boost::system::error_code& er, size_t size);
+//
+//	void OnError(const boost::system::error_code ec);
+//	
+//	void SendQueue();
+//
+//	boost::system::error_code AsyncReceive();
 
 	CMessenger(boost::asio::io_context& io, 
 			   const error_handler& error_handle, 
@@ -77,21 +77,21 @@ private:
 	bool _abort_connection = false;
 	bool _write_in_progress = false;
 	CMessagePtr _msg;
-};
 
+public:
 
-CMessengerPtr CMessenger::Instance(boost::asio::io_context& io, 
+static CMessengerPtr Instance(boost::asio::io_context& io, 
 	const error_handler& error_handle, const receive_handler& receive_handle) {
 	return CMessengerPtr(new CMessenger(io, error_handle, receive_handle));
 }
 
 
-CMessengerPtr CMessenger::Instance(boost::asio::io_context& io) {
+static CMessengerPtr Instance(boost::asio::io_context& io) {
 	return CMessengerPtr(new CMessenger(io));
 }
 
 
-void CMessenger::Run(SocketPtr sock) {
+void Run(SocketPtr sock) {
 	_sock = sock;
 	_send_coroutine = boost::asio::coroutine();
 	_receive_coroutine = boost::asio::coroutine();
@@ -99,7 +99,7 @@ void CMessenger::Run(SocketPtr sock) {
 }
 
 
-void CMessenger::StartAsyncOperations() {
+void StartAsyncOperations() {
 	_ASSERT(_sock && _sock->is_open());
 	SendQueue();
 	_message_ptr = CMessage::Instance();
@@ -107,7 +107,7 @@ void CMessenger::StartAsyncOperations() {
 }
 
 
-void CMessenger::OnWrite(const boost::system::error_code& er, size_t size) {
+void OnWrite(const boost::system::error_code& er, size_t size) {
 	boost::lock_guard<boost::mutex> lock(_mutex);
 	if (_abort_connection) {
 		return;
@@ -121,7 +121,7 @@ void CMessenger::OnWrite(const boost::system::error_code& er, size_t size) {
 
 
 
-void CMessenger::OnRecieve(const boost::system::error_code& er, size_t size) {
+void OnRecieve(const boost::system::error_code& er, size_t size) {
 	boost::lock_guard<boost::mutex> lock(_mutex);
 	if (_abort_connection) {
 		return;
@@ -135,7 +135,7 @@ void CMessenger::OnRecieve(const boost::system::error_code& er, size_t size) {
 
 
 
-void CMessenger::OnError(const boost::system::error_code ec) {
+void OnError(const boost::system::error_code ec) {
 	_abort_connection = true;
 	// if (ec != boost::asio::error::operation_aborted)
 	if (!_error_handler.empty()) {
@@ -144,7 +144,7 @@ void CMessenger::OnError(const boost::system::error_code ec) {
 }
 
 
-void CMessenger::SendQueue() {
+void SendQueue() {
 
 	BOOST_ASIO_CORO_REENTER(_send_coroutine) while (!_abort_connection) {
 		_write_in_progress = true;
@@ -163,8 +163,7 @@ void CMessenger::SendQueue() {
 }
 
 
-boost::system::error_code CMessenger::AsyncReceive() {
-	boost::system::error_code ec;
+boost::system::error_code AsyncReceive() {
 	BOOST_ASIO_CORO_REENTER(_receive_coroutine) while (!_abort_connection) {
 		_msg = CMessage::Instance();
 		BOOST_ASIO_CORO_YIELD boost::asio::async_read(*_sock, mutable_message_header(_msg), boost::bind(&CMessenger::OnRecieve, this, _1, _2));
@@ -175,15 +174,15 @@ boost::system::error_code CMessenger::AsyncReceive() {
 			}
 		}
 		else {
-			ec = boost::system::error_code(boost::system::errc::bad_message, boost::system::generic_category());
-			return ec;
+			return boost::system::error_code(boost::system::errc::bad_message, boost::system::generic_category());
 		}
 	}
+	return {};
 
 }
 
 
-void CMessenger::AsyncSend(const CMessagePtr& msg) {
+void AsyncSend(const CMessagePtr& msg) {
 	if (!_abort_connection){
 		msg->GetHeader()._body_size = msg->GetBuffer().second;
 		_send_queue.push_back(msg);
@@ -192,3 +191,5 @@ void CMessenger::AsyncSend(const CMessagePtr& msg) {
 		}
 	}
 }
+
+};

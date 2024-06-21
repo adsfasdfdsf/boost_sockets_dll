@@ -8,7 +8,7 @@ class CExecutor : public IExecutor
 public:
 	virtual void AddTaskHandler(const std::wstring& TaskName, eExecutionPolicy policy,
 		boost::function<void(const std::vector<char>&, TaskResponse&)> handler) override;
-	static CExecutorPtr Instance(const std::wstring& ExecName);
+	static CExecutorPtr Instance(const std::wstring& ExecName, DWORD main_thread_id);
 	bool Proccess(const TaskRequest& task_request, TaskResponse& task_response);
 private:
 	struct Task {
@@ -24,9 +24,10 @@ private:
 			return _name == task._name;
 		}
 	};
-	CExecutor(const std::wstring& ExecName);
+	CExecutor(const std::wstring& ExecName, DWORD main_thread_id);
 private:
 	std::wstring _exec_name;
+	DWORD _main_thread_id;
 	std::unordered_set<Task, Task::hash> _tasks;
 };
 

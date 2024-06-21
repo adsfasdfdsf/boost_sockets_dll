@@ -1,10 +1,13 @@
-#include "CService.h"
 #include "pch.h"
+#include "CService.h"
 #include "Utils.h"
 #include "Module.h"
+#include "registrar.h"
 #include "CMessage.h"
 #include "CExecutor.h"
 #include "CMessenger.h"
+#include "CProvider.h"
+#include "provider.h"
 CServicePtr CService::Instance(const CMessengerPtr& messenger_ptr, const std::wstring& executor_name)
 {
 	return CServicePtr(new CService(messenger_ptr, executor_name));
@@ -17,13 +20,12 @@ CService::CService(const CMessengerPtr& messenger_ptr, const std::wstring& execu
 
 void CService::OnErrorReceived(const boost::system::error_code& ec)
 {
-	
+
 }
 
 void CService::OnRequestReceived(const CMessagePtr& msg_ptr)
 {
-	//auto executor = GetProvider().GetRegistrar().GetExecutor(_executor_name);
-	CExecutorPtr executor;
+	CExecutorPtr executor = CExecutorPtr((CExecutor*)GetProvider().getRegistrar().GetExecutor(_executor_name).get());
 	if (!executor) {
 		return;
 	}

@@ -2,6 +2,7 @@
 #include "CServer.h"
 #include "port_selector.h"
 #include "CMessenger.h"
+#include "CService.h"
 CRemoteConnectionManagerPtr CRemoteConnectionManager::Instance(const std::wstring& executor_name)
 {
 	return CRemoteConnectionManagerPtr(new CRemoteConnectionManager(executor_name));
@@ -12,7 +13,7 @@ void CRemoteConnectionManager::StartAcceptingRemoteConnections(unsigned short po
 		_acceptor_ptr = CAcceptor::Instance(_io, port, _executor_name);
 		_acceptor_ptr->Start();
 		for (size_t i = 0; i < std::thread::hardware_concurrency(); ++i) {
-			_thread_pool.push_back(boost::make_shared<boost::thread>(new boost::thread(boost::bind(&boost::asio::io_service::run, &_io))));
+			_thread_pool.push_back(boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&boost::asio::io_service::run, &_io))));
 		}
 	}
 	else {
@@ -82,8 +83,7 @@ void CAcceptor::OnAccept(const boost::system::error_code& ec, const SocketPtr& s
 	if (ec.value() == 0) {
 		CMessengerPtr messenger_ptr = CMessenger::Instance(_io);
 		boost::lock_guard lock(_mutex);
-		// TODO active_services . push back service
-		_active_services.push_back({});
+		_active_services.push_back(CService::Instance(messenger_ptr, _executor_name));
 	}
 	if (!_is_stopped.load()) {
 		InitAccept();
@@ -103,10 +103,16 @@ void CAcceptor::Start()
 
 void CAcceptor::Restart()
 {
+	_is_stopped.store(false);
+	_io.restart();
+	InitAccept();
 }
 
 void CAcceptor::Stop()
 {
+	_is_stopped.store(true);
+	_acceptor.cancel();
+	_io.stop();
 }
 
 unsigned short CAcceptor::GetOpenedPort()

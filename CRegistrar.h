@@ -12,10 +12,11 @@ public:
 	virtual unsigned short AllowRemoteExecution(const std::wstring& ExecName) override;
 	virtual void DenyRemoteExecution(const std::wstring& ExecName, unsigned short port) override;
 	virtual void RunPolling(const std::wstring& ExecName) override;
-
+	CRegistrar(DWORD thread_id) : _main_thread_id(thread_id) {};
 private:
 	std::unordered_map<std::wstring, CExecutorPtr> _executors;
 	std::unordered_map<std::wstring, CRemoteConnectionManagerPtr> _servers;
 	std::wstring _ip;
 	unsigned short _port;
+	DWORD _main_thread_id;
 };

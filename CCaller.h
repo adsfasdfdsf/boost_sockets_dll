@@ -17,7 +17,7 @@ public:
 	boost::signals2::scoped_connection Init(const SocketPtr& _sock,
 		const boost::function<void(const boost::system::error_code&)>& on_error);
 	virtual std::future<TaskResponse> Call(const TaskRequest& request) override;
-	virtual boost::signals2::scoped_connection SubscribeOnConnectionLoss(const boost::function<void()>& on_disconnect) override;
+	virtual boost::signals2::scoped_connection SubscribeOnConnectionLoss(const boost::function<void()>& on_disconnect) override { return {}; };
 private:
 	CMessengerPtr _messenger_ptr;
 	boost::uuids::uuid _uuid;

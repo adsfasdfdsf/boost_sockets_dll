@@ -3,6 +3,7 @@
 #include <boost/asio/ip/tcp.hpp>
 using IProviderPtr = boost::shared_ptr<class IProvider>;
 using IConnectorPtr = boost::shared_ptr<class IConnector>;
+using CConnectorPtr = boost::shared_ptr<class CConnector>;
 using IRegistrarPtr = boost::shared_ptr<class IRegistrar>;
 using IExecutorPtr = boost::shared_ptr<class IExecutor>;
 using ICallerPtr = boost::shared_ptr<class ICaller>;

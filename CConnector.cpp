@@ -66,5 +66,5 @@ std::future<ICallerPtr> CConnector::ConnectToExecutor()
 
 IConnectorPtr CConnector::Instance(const std::wstring& ip, unsigned short port, const std::wstring& executor_name)
 {
-    return boost::make_shared<IConnector>(new CConnector(ip, port, executor_name));
+    return IConnectorPtr((IConnector*)new CConnector(ip, port, executor_name));
 }

@@ -48,7 +48,7 @@ public:
 
 private:
 	CMessage() {};
-	CMessage(std::vector<char> data, eAction action) : _buffer(data), _header(Header(data.size(), action)) {};
+	CMessage(std::vector<char> data, eAction action) : _buffer(data), _header(Header((int32_t)data.size(), action)) {};
 	Header _header;
 	std::vector<char> _buffer;
 };
